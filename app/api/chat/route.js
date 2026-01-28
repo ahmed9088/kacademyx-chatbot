@@ -7,13 +7,11 @@ export const maxDuration = 30;
 export async function POST(req) {
     try {
         const { messages, system } = await req.json();
+        console.log("[Server] Chat Route v1.1.0-Router - Initialized");
         let hfKey = (process.env.HUGGINGFACE_API_KEY || process.env.HF_TOKEN || "").trim();
 
         if (!hfKey || hfKey === "undefined" || hfKey === "null") {
-            console.error("[Server] Missing HF API Key. Environment status:", {
-                hasKey: !!hfKey,
-                keyLength: hfKey?.length
-            });
+            console.error("[Server] Critical: Missing HUGGINGFACE_API_KEY in environment.");
             return new Response(JSON.stringify({ error: 'HF API key missing or invalid' }), { status: 500 });
         }
 
