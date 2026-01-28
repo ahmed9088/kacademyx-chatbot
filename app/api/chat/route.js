@@ -7,11 +7,21 @@ export const maxDuration = 30;
 export async function POST(req) {
     try {
         const { messages, system } = await req.json();
-        const hfKey = process.env.HUGGINGFACE_API_KEY || process.env.HF_TOKEN;
+        let hfKey = (process.env.HUGGINGFACE_API_KEY || process.env.HF_TOKEN || "").trim();
 
-        if (!hfKey) {
-            console.error("[Server] Missing API Key");
-            return new Response(JSON.stringify({ error: 'HF API key missing' }), { status: 500 });
+        if (!hfKey || hfKey === "undefined" || hfKey === "null") {
+            console.error("[Server] Missing HF API Key. Environment status:", {
+                hasKey: !!hfKey,
+                keyLength: hfKey?.length
+            });
+            return new Response(JSON.stringify({ error: 'HF API key missing or invalid' }), { status: 500 });
+        }
+
+        // Detailed log for 401 debugging (safe format)
+        if (hfKey.startsWith("hf_")) {
+            console.log(`[Server] HF Token format looks correct (${hfKey.length} chars).`);
+        } else {
+            console.warn(`[Server] HF Token does not start with "hf_". This might be the cause of the 401.`);
         }
 
         const defaultSystemPrompt = `You are Kacademyx, a highly advanced AI tutor designed to provide the maximum possible depth, accuracy, and completeness.
