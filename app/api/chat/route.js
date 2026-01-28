@@ -40,18 +40,27 @@ Your goal is to be the ultimate educational resource, adapting perfectly to the 
             content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content || '')
         }));
 
-        // Use LangChainAdapter for consistent Vercel AI SDK compatibility
+        // Use LangChainAdapter for consistent Vercel AI SDK compatibility (Comment retained for context)
+        // NOTE: Strictly using GLM-4.7-Flash as requested.
+        console.log(`[Server] Connecting to GLM-4.7-Flash. Key Present: ${!!hfKey}`);
 
-        const stream = await openai.chat.completions.create({
-            model: "zai-org/GLM-4.7-Flash",
-            messages: [
-                { role: 'system', content: activeSystemPrompt },
-                ...validMessages.map(m => ({ role: m.role, content: m.content }))
-            ],
-            stream: true,
-            temperature: 0.7,
-            max_tokens: 4000,
-        });
+        let stream;
+        try {
+            stream = await openai.chat.completions.create({
+                model: "zai-org/GLM-4.7-Flash",
+                messages: [
+                    { role: 'system', content: activeSystemPrompt },
+                    ...validMessages.map(m => ({ role: m.role, content: m.content }))
+                ],
+                stream: true,
+                temperature: 0.7,
+                max_tokens: 4000,
+            });
+            console.log("[Server] Stream connection established.");
+        } catch (apiErr) {
+            console.error("[Server] GLM-4.7 Connection Failed:", apiErr.status, apiErr.message);
+            throw apiErr; // Re-throw to be caught by main handler
+        }
 
         // Create a manual ReadableStream to pipe tokens directly
         const streamResponse = new ReadableStream({
