@@ -51,7 +51,7 @@ Your goal is to be the ultimate educational resource, adapting perfectly to the 
         });
 
         // Use toTextStreamResponse for raw text streaming compatible with our manual reader
-        return result.toTextStreamResponse();
+        return result.toDataStreamResponse();
 
     } catch (error) {
         console.error("Fatal AI Error:", error);
