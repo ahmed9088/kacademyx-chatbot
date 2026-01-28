@@ -42,7 +42,8 @@ Your goal is to be the ultimate educational resource, adapting perfectly to the 
             content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content || '')
         }));
 
-        const result = streamText({
+        // Generate stream
+        const result = await streamText({
             model: openai("Qwen/Qwen2.5-Coder-32B-Instruct"),
             system: activeSystemPrompt,
             messages: validMessages, // Pass sanitized messages
@@ -50,8 +51,17 @@ Your goal is to be the ultimate educational resource, adapting perfectly to the 
             maxTokens: 4000,
         });
 
-        // Use toTextStreamResponse for raw text streaming compatible with our manual reader
-        return result.toDataStreamResponse();
+        // Robust stream handling compatible with different SDK versions/responses
+        if (typeof result.toDataStreamResponse === 'function') {
+            return result.toDataStreamResponse();
+        }
+
+        if (typeof result.toTextStreamResponse === 'function') {
+            return result.toTextStreamResponse();
+        }
+
+        // Fallback for unexpected result structure
+        return new Response(JSON.stringify({ error: "Stream method missing on AI result" }), { status: 500 });
 
     } catch (error) {
         console.error("Fatal AI Error:", error);
