@@ -223,12 +223,9 @@ export default function Home() {
           const chunk = decoder.decode(value, { stream: true });
 
           // Parse Vercel AI SDK Data Stream Protocol
-          console.log('[DEBUG] Raw Chunk:', chunk);
           const lines = chunk.split('\n');
-          console.log('[DEBUG] Split Lines:', lines.length);
 
           for (const line of lines) {
-            console.log('[DEBUG] Processing Line:', line);
             if (line.startsWith('0:')) {
               const content = line.slice(2);
               if (content.startsWith('"') && content.endsWith('"')) {
@@ -244,7 +241,6 @@ export default function Home() {
               continue;
             } else {
               // Fallback for raw text: handles toTextStreamResponse fallback cases
-              console.log('[DEBUG] Fallback Text:', line);
               accumulatedContent += line;
             }
           }
