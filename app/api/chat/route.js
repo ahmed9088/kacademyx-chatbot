@@ -1,5 +1,4 @@
 import { OpenAI } from 'openai';
-import { LangChainAdapter } from 'ai';
 
 export const maxDuration = 30;
 // export const runtime = 'edge'; // Switched to Node.js for stability
@@ -18,7 +17,6 @@ export async function POST(req) {
         const openai = new OpenAI({
             apiKey: hfKey,
             baseURL: "https://router.huggingface.co/v1",
-            dangerouslyAllowBrowser: true
         });
 
         const recentMessages = messages.slice(-6); // Keep context concise (Optimized from 10)
@@ -55,8 +53,33 @@ Your goal is to be the ultimate educational resource, adapting perfectly to the 
             max_tokens: 4000,
         });
 
-        // Convert the raw OpenAI stream to a Vercel AI SDK compatible data stream
-        return LangChainAdapter.toDataStreamResponse(stream);
+        // Create a manual ReadableStream to pipe tokens directly
+        const streamResponse = new ReadableStream({
+            async start(controller) {
+                try {
+                    for await (const chunk of stream) {
+                        const content = chunk.choices[0]?.delta?.content || "";
+                        if (content) {
+                            // Enforce Vercel AI SDK Data Protocol: 0:"json_string_content"\n
+                            // Escape newlines/quotes correctly by JSON.stringify
+                            const protocolChunk = `0:${JSON.stringify(content)}\n`;
+                            controller.enqueue(new TextEncoder().encode(protocolChunk));
+                        }
+                    }
+                    controller.close();
+                } catch (err) {
+                    console.error("Stream pump error:", err);
+                    controller.error(err);
+                }
+            }
+        });
+
+        return new Response(streamResponse, {
+            headers: {
+                'Content-Type': 'text/plain; charset=utf-8',
+                'X-Vercel-AI-Data-Stream': 'v1'
+            }
+        });
 
     } catch (error) {
         console.error("Fatal AI Error:", error);
