@@ -259,6 +259,10 @@ export default function Home() {
                 } else {
                   accumulatedContent += content;
                 }
+              } else {
+                // Fallback: If it doesn't start with 0:, assume it's raw text
+                // (This handles the case where backend falls back to toTextStreamResponse)
+                accumulatedContent += line;
               }
             }
           }
