@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Menu, Info, Download, RefreshCw, LogOut, ChevronDown } from 'lucide-react';
 
-const TopBar = ({ title, onToggleSidebar, onToggleAbout, onExport, onRegenerate, onLogout, user }) => {
+const TopBar = ({ currentChatTitle, toggleSidebar, onExport, onRegenerate, onOpenAbout, onLogout, user, isSidebarOpen }) => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef(null);
 
@@ -25,8 +25,8 @@ const TopBar = ({ title, onToggleSidebar, onToggleAbout, onExport, onRegenerate,
     <header className="h-14 flex items-center justify-between px-4 bg-dark-800/80 light-theme:bg-white/80 backdrop-blur-xl border-b border-dark-700/50 light-theme:border-dark-200/50 sticky top-0 z-50">
       <div className="flex items-center gap-3 flex-1 min-w-0">
         <button
-          className="lg:hidden icon-btn flex-shrink-0"
-          onClick={onToggleSidebar}
+          className={`icon-btn flex-shrink-0 transition-transform duration-300 ${isSidebarOpen ? 'lg:hidden' : ''}`}
+          onClick={toggleSidebar}
           aria-label="Toggle sidebar"
         >
           <Menu size={20} strokeWidth={1.75} />
@@ -34,20 +34,20 @@ const TopBar = ({ title, onToggleSidebar, onToggleAbout, onExport, onRegenerate,
         <div className="flex flex-col gap-0.5 min-w-0">
           <span className="text-[10px] font-bold uppercase tracking-wider text-primary-400">AI Tutor</span>
           <h2 className="text-sm font-semibold text-dark-100 light-theme:text-dark-900 truncate pr-2">
-            {title || 'New Conversation'}
+            {currentChatTitle || 'New Conversation'}
           </h2>
         </div>
       </div>
 
       <div className="flex items-center gap-2">
         <div className="flex gap-0.5">
-          <button className="icon-btn" onClick={onToggleAbout} title="About">
+          <button className="icon-btn" onClick={onOpenAbout} title="About">
             <Info size={18} strokeWidth={1.75} />
           </button>
-          <button className="icon-btn" onClick={onExport} title="Export chat">
+          <button className="icon-btn hidden sm:flex" onClick={onExport} title="Export chat">
             <Download size={18} strokeWidth={1.75} />
           </button>
-          <button className="icon-btn" onClick={onRegenerate} title="Regenerate response">
+          <button className="icon-btn hidden sm:flex" onClick={onRegenerate} title="Regenerate response">
             <RefreshCw size={18} strokeWidth={1.75} />
           </button>
         </div>

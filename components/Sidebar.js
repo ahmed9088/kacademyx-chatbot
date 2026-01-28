@@ -168,7 +168,7 @@ const Sidebar = ({
         fixed inset-y-0 left-0 h-full bg-dark-850 light-theme:bg-dark-50 border-r border-dark-700/50 light-theme:border-dark-200/50
         flex flex-col transition-transform duration-300 z-50
         lg:relative lg:translate-x-0
-        ${isOpen ? 'translate-x-0 w-72 lg:w-64' : '-translate-x-full lg:w-20'}
+        ${isOpen ? 'translate-x-0 w-80 lg:w-64' : '-translate-x-full lg:translate-x-0 lg:w-20'}
       `}>
         {/* Header */}
         <div className="p-4 flex items-center justify-between border-b border-dark-700/50 light-theme:border-dark-200/50 h-16">

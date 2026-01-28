@@ -82,8 +82,8 @@ const InputArea = ({ input, onChange, onSubmit, isLoading, onStop }) => {
   };
 
   return (
-    <div className="w-full px-2 sm:px-4 pb-4 sm:pb-6 pt-2 bg-gradient-to-t from-dark-900 via-dark-900 to-transparent light-theme:from-dark-50 light-theme:via-dark-50 relative z-20">
-      <div className="max-w-3xl mx-auto relative">
+    <div className="w-full px-2 sm:px-4 pb-4 sm:pb-8 pt-2 bg-gradient-to-t from-dark-900 via-dark-900 to-transparent light-theme:from-dark-50 light-theme:via-dark-50 relative z-30">
+      <div className="max-w-4xl mx-auto relative px-1 sm:px-0">
         <motion.div
           className={`
             relative rounded-2xl border transition-all duration-300 overflow-hidden
@@ -100,7 +100,7 @@ const InputArea = ({ input, onChange, onSubmit, isLoading, onStop }) => {
           <form onSubmit={onSubmit} className="flex items-end gap-2 p-3">
             <button
               type="button"
-              className="w-9 h-9 flex items-center justify-center rounded-xl text-dark-400 hover:bg-dark-700/50 hover:text-dark-200 transition-colors"
+              className="w-10 h-10 flex items-center justify-center rounded-xl text-dark-400 hover:bg-dark-700/50 hover:text-dark-200 transition-colors flex-shrink-0"
               title="Attach file (Coming soon)"
             >
               <Paperclip size={18} />
@@ -116,7 +116,8 @@ const InputArea = ({ input, onChange, onSubmit, isLoading, onStop }) => {
               placeholder={isLoading ? "Thinking..." : (isListening ? "Listening..." : "Message Kacademyx...")}
               disabled={isLoading}
               rows={1}
-              className={`flex-1 py-2 bg-transparent text-sm text-dark-100 light-theme:text-dark-900 placeholder-dark-500 resize-none outline-none max-h-48 scrollbar-hide
+              enterKeyHint="send"
+              className={`flex-1 py-3 px-1 bg-transparent text-base sm:text-sm text-dark-100 light-theme:text-dark-900 placeholder-dark-500 resize-none outline-none max-h-48 scrollbar-hide
                 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}
               `}
             />
