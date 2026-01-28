@@ -230,41 +230,22 @@ export default function Home() {
           for (const line of lines) {
             console.log('[DEBUG] Processing Line:', line);
             if (line.startsWith('0:')) {
-              // The content is JSON stringified, so we need to parse it.
-              // Actually, ai sdk format is `0:"text"` or `0:text` depending on version but usually JSON string
-              try {
-                const textContent = JSON.parse(line.slice(2));
-                accumulatedContent += textContent;
-              } catch (e) {
-                // Fallback if not JSON encoded (older protocol or raw) or incomplete chunk
-                // But for robustness, let's just use raw slice if parse fails or if it's simple text.
-                // Actually, standard protocol is json-string-wrapped.
+              const content = line.slice(2);
+              if (content.startsWith('"') && content.endsWith('"')) {
+                try {
+                  accumulatedContent += JSON.parse(content);
+                } catch {
+                  accumulatedContent += content;
+                }
+              } else {
+                accumulatedContent += content;
               }
             } else if (!line.trim()) {
               continue;
             } else {
-              // Try to handle raw text fallbacks if protocol is not used, 
-              // BUT since we switched to toDataStreamResponse, we MUST parse protocol.
-              // Let's implement a simple robust parser.
-              // If line starts with 0:, take the rest.
-              // For now, let's stick to the simplest standard parser or use readDataStream if we could.
-              // Since we are manual:
-              if (line.startsWith('0:')) {
-                const content = line.slice(2);
-                // Remove wrapping quotes if present
-                if (content.startsWith('"') && content.endsWith('"')) {
-                  try {
-                    accumulatedContent += JSON.parse(content);
-                  } catch {
-                    accumulatedContent += content;
-                  }
-                } else {
-                  accumulatedContent += content;
-                }
-              } else {
-                // Fallback for raw text or other line types
-                accumulatedContent += line;
-              }
+              // Fallback for raw text: handles toTextStreamResponse fallback cases
+              console.log('[DEBUG] Fallback Text:', line);
+              accumulatedContent += line;
             }
           }
 
