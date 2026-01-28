@@ -14,11 +14,6 @@ export async function POST(req) {
             return new Response(JSON.stringify({ error: 'HF API key missing' }), { status: 500 });
         }
 
-        const activeSystemPrompt = system || `You are Kacademyx...`; // (Truncated for brevity, normally I'd keep the full prompt string here, but reusing existing constant if possible is better. I will inline it to be safe or use the existing variable logic if I can match it.)
-        // Actually, to ensure I don't lose the prompt, I will reconstruct the full function body to be safe, or just replace the inner logic.
-        // Let's replace the inner logic of POST.
-
-        // Re-defining system prompt to ensure it's present
         const defaultSystemPrompt = `You are Kacademyx, a highly advanced AI tutor designed to provide the maximum possible depth, accuracy, and completeness.
 
 ADAPTIVE BEHAVIOR:
@@ -33,7 +28,7 @@ Your goal is to be the ultimate educational resource, adapting perfectly to the 
 
         const finalSystemPrompt = system || defaultSystemPrompt;
 
-        const filteredMessages = messages.map(m => ({
+        const filteredMessages = messages.slice(-10).map(m => ({
             role: m.role === 'assistant' ? 'assistant' : 'user',
             content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content || '')
         }));

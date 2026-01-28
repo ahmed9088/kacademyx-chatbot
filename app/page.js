@@ -312,14 +312,17 @@ export default function Home() {
       return;
     }
 
-    // Only sync when NOT actively receiving a stream
-    if (isStreamingRef.current) {
+    // Only sync when NOT actively receiving a stream and NOT loading
+    if (isStreamingRef.current || isLoading) {
       return;
     }
 
     if (Array.isArray(serverMessages) && serverMessages.length > 0) {
-      // Use setMessages functional update to access current state without adding to deps
       setMessages(prev => {
+        // If we have an AI placeholder in prev, don't sync yet (let the stream finish)
+        const hasAiPlaceholder = prev.some(m => m.id.startsWith('ai-') && !m.content);
+        if (hasAiPlaceholder) return prev;
+
         const localMessageIds = new Set(prev.map(m => m.id));
         const hasNewMessages = serverMessages.some(sm => !localMessageIds.has(sm.id));
 
