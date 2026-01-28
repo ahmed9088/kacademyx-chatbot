@@ -89,6 +89,7 @@
     background-color: var(--color-dark-900);
     color: var(--color-dark-100);
     overflow: hidden;
+    overscroll-behavior-y: none;
   }
 
   body.light-theme {

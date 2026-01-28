@@ -607,7 +607,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex h-screen bg-dark-900 light-theme:bg-dark-50 text-dark-100 light-theme:text-dark-900 overflow-hidden">
+    <div className="flex h-[100dvh] bg-dark-900 light-theme:bg-dark-50 text-dark-100 light-theme:text-dark-900 overflow-hidden">
       <Sidebar
         chats={Array.isArray(chats) ? chats : []}
         activeChatId={activeChatId}
@@ -620,7 +620,7 @@ export default function Home() {
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 h-full max-h-full overflow-hidden relative">
         <TopBar
           toggleSidebar={toggleSidebar}
           isSidebarOpen={isSidebarOpen}

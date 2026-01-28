@@ -14,6 +14,8 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Kacademyx | Advanced Educational Chatbot",
   description: "Web-based educational chatbot for personalized learning.",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, interactive-widget=resizes-content",
+  themeColor: "#0f172a",
 };
 
 import { Providers } from '../components/Providers';

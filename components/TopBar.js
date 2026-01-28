@@ -22,7 +22,7 @@ const TopBar = ({ currentChatTitle, toggleSidebar, onExport, onRegenerate, onOpe
   };
 
   return (
-    <header className="h-14 flex flex-shrink-0 items-center justify-between px-4 bg-dark-800 light-theme:bg-white border-b border-dark-700/50 light-theme:border-dark-200/50 sticky top-0 z-[60]">
+    <header className="h-14 w-full flex flex-shrink-0 items-center justify-between px-4 bg-dark-800 light-theme:bg-white border-b border-dark-700/50 light-theme:border-dark-200/50 relative z-[100]">
       <div className="flex items-center gap-3 flex-1 min-w-0">
         <button
           className={`icon-btn flex-shrink-0 transition-transform duration-300 ${isSidebarOpen ? 'lg:hidden' : ''}`}
