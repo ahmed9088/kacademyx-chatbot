@@ -54,9 +54,7 @@ Your goal is to be the ultimate educational resource, adapting perfectly to the 
             max_tokens: 4000
         };
 
-        console.log(`[Server] Requesting GLM-4.7-Flash via Standard Inference API...`);
-
-        const response = await fetch("https://api-inference.huggingface.co/v1/chat/completions", {
+        const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${hfKey}`,
