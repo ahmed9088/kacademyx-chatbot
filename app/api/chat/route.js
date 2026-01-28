@@ -35,7 +35,7 @@ ADAPTIVE BEHAVIOR:
 Your goal is to be the ultimate educational resource, adapting perfectly to the user's intent.`;
         const activeSystemPrompt = system || defaultSystemPrompt;
 
-        console.log(">>> AI Streaming Starting - GLM-4.7-Flash");
+        console.log(">>> AI Streaming Starting - Qwen/Qwen2.5-Coder-32B-Instruct");
 
         const validMessages = recentMessages.map(m => ({
             role: m.role === 'assistant' ? 'assistant' : 'user',

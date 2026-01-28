@@ -1,8 +1,18 @@
-async function testHFDirect() {
-    const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY || "YOUR_HF_KEY";
-    const url = `https://router.huggingface.co/v1/chat/completions`;
+require('dotenv').config({ path: '.env.local' });
+// const fetch = require('node-fetch'); // REMOVED: Using Native Fetch
 
-    console.log(`Testing HF API Direct: ${url}`);
+async function testHFDirect() {
+    const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY;
+    console.log("Using Key:", HUGGINGFACE_API_KEY ? HUGGINGFACE_API_KEY.slice(0, 5) + "..." : "UNDEFINED");
+
+    if (!HUGGINGFACE_API_KEY) {
+        console.error("No HUGGINGFACE_API_KEY found in .env.local");
+        return;
+    }
+    const url = `https://router.huggingface.co/v1/chat/completions`;
+    const MODEL = "Qwen/Qwen2.5-Coder-32B-Instruct";
+
+    console.log(`Testing HF API Direct: ${url} with model ${MODEL}`);
 
     try {
         const response = await fetch(url, {
@@ -12,12 +22,12 @@ async function testHFDirect() {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: "zai-org/GLM-4.7-Flash:novita",
+                model: MODEL,
                 messages: [
-                    { role: 'user', content: 'Hello!' }
+                    { role: 'user', content: 'Return the word SUCCESS.' }
                 ],
                 stream: true,
-                max_tokens: 100
+                max_tokens: 50
             })
         });
 
@@ -25,7 +35,7 @@ async function testHFDirect() {
 
         if (!response.ok) {
             const txt = await response.text();
-            console.error(txt);
+            console.error("Error Body:", txt);
             return;
         }
 
@@ -39,10 +49,12 @@ async function testHFDirect() {
                 break;
             }
             const chunk = decoder.decode(value, { stream: true });
-            console.log('CHUNK:', chunk.slice(0, 100) + "..."); // log just a bit
-            break; // Success if we get even one chunk
+            if (chunk.trim()) {
+                console.log('CHUNK RECEIVED (sample):', chunk.slice(0, 50).replace(/\n/g, '\\n'));
+                break;
+            }
         }
-        console.log("Success: Stream started.");
+        console.log("Test Complete: API is responsive.");
 
     } catch (error) {
         console.error('Direct HF Test Failed:', error);
