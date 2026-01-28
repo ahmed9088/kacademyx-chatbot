@@ -2,31 +2,47 @@
 const { OpenAI } = require('openai');
 require('dotenv').config({ path: '.env.local' });
 
-// Mimic backend logic to verify model access locally
-async function verifyModel() {
-    console.log("Verifying GLM-4.7 Model access...");
+async function verifyAdapter() {
+    console.log("Verifying GLM-4.7 with LangChainAdapter...");
 
-    if (!process.env.HUGGINGFACE_API_KEY) {
-        console.error("Error: HUGGINGFACE_API_KEY not found in .env.local");
+    // Dynamic import for ESM package 'ai'
+    const { LangChainAdapter } = await import('ai');
+
+    // Fallback logic from route.js
+    const hfKey = process.env.HUGGINGFACE_API_KEY || process.env.HF_TOKEN;
+    if (!hfKey) {
+        console.error("Error: HUGGINGFACE_API_KEY not found");
         return;
     }
 
-    const client = new OpenAI({
+    const openai = new OpenAI({
         baseURL: "https://router.huggingface.co/v1",
-        apiKey: process.env.HUGGINGFACE_API_KEY,
+        apiKey: hfKey,
     });
 
     try {
-        const stream = await client.chat.completions.create({
+        const stream = await openai.chat.completions.create({
             model: "zai-org/GLM-4.7-Flash",
-            messages: [{ role: "user", content: "Hello, say 'Test OK'" }],
+            messages: [{ role: "user", content: "Say 'Adapter Works'" }],
             stream: true,
+            max_tokens: 100,
         });
 
-        console.log("Stream connected!");
-        for await (const chunk of stream) {
-            const content = chunk.choices[0]?.delta?.content || "";
-            process.stdout.write(content);
+        console.log("Stream created. Testing Adapter transformation...");
+
+        // Simulate what the browser receives
+        const response = LangChainAdapter.toDataStreamResponse(stream);
+
+        // Handle the response body decoding manually since we are in node
+        // response.body is a ReadableStream (web standard), not Node stream
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value);
+            console.log("Raw Chunk:", chunk);
         }
         console.log("\nVerification Complete.");
 
@@ -35,4 +51,4 @@ async function verifyModel() {
     }
 }
 
-verifyModel();
+verifyAdapter();

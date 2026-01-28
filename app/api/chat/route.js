@@ -1,5 +1,5 @@
-import { streamText } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
+import { OpenAI } from 'openai';
+import { LangChainAdapter } from 'ai';
 
 export const maxDuration = 30;
 // export const runtime = 'edge'; // Switched to Node.js for stability
@@ -7,16 +7,18 @@ export const maxDuration = 30;
 export async function POST(req) {
     try {
         const { messages, system } = await req.json();
-        const hfKey = process.env.HUGGINGFACE_API_KEY;
+        // Fallback to process.env.HUGGINGFACE_API_KEY if HF_TOKEN is not set
+        const hfKey = process.env.HUGGINGFACE_API_KEY || process.env.HF_TOKEN;
 
         if (!hfKey) {
             return new Response(JSON.stringify({ error: 'HF API key missing' }), { status: 500 });
         }
 
-        // Initialize OpenAI with HF key
-        const openai = createOpenAI({
+        // Initialize standard OpenAI client
+        const openai = new OpenAI({
             apiKey: hfKey,
             baseURL: "https://router.huggingface.co/v1",
+            dangerouslyAllowBrowser: true
         });
 
         const recentMessages = messages.slice(-6); // Keep context concise (Optimized from 10)
@@ -40,26 +42,21 @@ Your goal is to be the ultimate educational resource, adapting perfectly to the 
             content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content || '')
         }));
 
-        // Generate stream
-        const result = await streamText({
-            model: openai("zai-org/GLM-4.7-Flash"),
-            system: activeSystemPrompt,
-            messages: validMessages, // Pass sanitized messages
+        // Use LangChainAdapter for consistent Vercel AI SDK compatibility
+
+        const stream = await openai.chat.completions.create({
+            model: "zai-org/GLM-4.7-Flash",
+            messages: [
+                { role: 'system', content: activeSystemPrompt },
+                ...validMessages.map(m => ({ role: m.role, content: m.content }))
+            ],
+            stream: true,
             temperature: 0.7,
-            maxTokens: 4000,
+            max_tokens: 4000,
         });
 
-        // Robust stream handling compatible with different SDK versions/responses
-        if (typeof result.toDataStreamResponse === 'function') {
-            return result.toDataStreamResponse();
-        }
-
-        if (typeof result.toTextStreamResponse === 'function') {
-            return result.toTextStreamResponse();
-        }
-
-        // Fallback for unexpected result structure
-        return new Response(JSON.stringify({ error: "Stream method missing on AI result" }), { status: 500 });
+        // Convert the raw OpenAI stream to a Vercel AI SDK compatible data stream
+        return LangChainAdapter.toDataStreamResponse(stream);
 
     } catch (error) {
         console.error("Fatal AI Error:", error);
