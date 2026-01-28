@@ -222,11 +222,13 @@ export default function Home() {
 
           const chunk = decoder.decode(value, { stream: true });
 
-          // Parse Vercel AI SDK Data Stream Protocol (e.g. 0:"text")
-          // Protocol: id:content
-          // 0: Text part
+          // Parse Vercel AI SDK Data Stream Protocol
+          console.log('[DEBUG] Raw Chunk:', chunk);
           const lines = chunk.split('\n');
+          console.log('[DEBUG] Split Lines:', lines.length);
+
           for (const line of lines) {
+            console.log('[DEBUG] Processing Line:', line);
             if (line.startsWith('0:')) {
               // The content is JSON stringified, so we need to parse it.
               // Actually, ai sdk format is `0:"text"` or `0:text` depending on version but usually JSON string
@@ -260,8 +262,8 @@ export default function Home() {
                   accumulatedContent += content;
                 }
               } else {
-                // Fallback: If it doesn't start with 0:, assume it's raw text
-                // (This handles the case where backend falls back to toTextStreamResponse)
+                // Fallback for raw text or other line types
+                console.log('[DEBUG] Raw Text Fallback:', line);
                 accumulatedContent += line;
               }
             }

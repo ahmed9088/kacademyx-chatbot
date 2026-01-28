@@ -53,14 +53,17 @@ Your goal is to be the ultimate educational resource, adapting perfectly to the 
 
         // Robust stream handling compatible with different SDK versions/responses
         if (typeof result.toDataStreamResponse === 'function') {
+            console.log("SERVER DEBUG: Using toDataStreamResponse");
             return result.toDataStreamResponse();
         }
 
         if (typeof result.toTextStreamResponse === 'function') {
+            console.log("SERVER DEBUG: Using toTextStreamResponse");
             return result.toTextStreamResponse();
         }
 
         // Fallback for unexpected result structure
+        console.error("SERVER DEBUG: No stream method found!");
         return new Response(JSON.stringify({ error: "Stream method missing on AI result" }), { status: 500 });
 
     } catch (error) {
