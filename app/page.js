@@ -263,7 +263,6 @@ export default function Home() {
                 }
               } else {
                 // Fallback for raw text or other line types
-                console.log('[DEBUG] Raw Text Fallback:', line);
                 accumulatedContent += line;
               }
             }

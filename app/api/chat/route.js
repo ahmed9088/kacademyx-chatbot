@@ -35,8 +35,6 @@ ADAPTIVE BEHAVIOR:
 Your goal is to be the ultimate educational resource, adapting perfectly to the user's intent.`;
         const activeSystemPrompt = system || defaultSystemPrompt;
 
-        console.log(">>> AI Streaming Starting - Qwen/Qwen2.5-Coder-32B-Instruct");
-
         const validMessages = recentMessages.map(m => ({
             role: m.role === 'assistant' ? 'assistant' : 'user',
             content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content || '')
@@ -44,7 +42,7 @@ Your goal is to be the ultimate educational resource, adapting perfectly to the 
 
         // Generate stream
         const result = await streamText({
-            model: openai("Qwen/Qwen2.5-Coder-32B-Instruct"),
+            model: openai("zai-org/GLM-4.7-Flash"),
             system: activeSystemPrompt,
             messages: validMessages, // Pass sanitized messages
             temperature: 0.7,
@@ -53,17 +51,14 @@ Your goal is to be the ultimate educational resource, adapting perfectly to the 
 
         // Robust stream handling compatible with different SDK versions/responses
         if (typeof result.toDataStreamResponse === 'function') {
-            console.log("SERVER DEBUG: Using toDataStreamResponse");
             return result.toDataStreamResponse();
         }
 
         if (typeof result.toTextStreamResponse === 'function') {
-            console.log("SERVER DEBUG: Using toTextStreamResponse");
             return result.toTextStreamResponse();
         }
 
         // Fallback for unexpected result structure
-        console.error("SERVER DEBUG: No stream method found!");
         return new Response(JSON.stringify({ error: "Stream method missing on AI result" }), { status: 500 });
 
     } catch (error) {

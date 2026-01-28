@@ -1,33 +1,38 @@
-const { createOpenAI } = require('@ai-sdk/openai');
-const { generateText } = require('ai');
-const dotenv = require('dotenv');
-const path = require('path');
 
-dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
+const { OpenAI } = require('openai');
+require('dotenv').config({ path: '.env.local' });
 
-async function test() {
-    console.log('Testing HF Router with GLM-4.7-Flash...');
-    const apiKey = process.env.HUGGINGFACE_API_KEY;
-    if (!apiKey) {
-        console.error('No API key found!');
+// Mimic backend logic to verify model access locally
+async function verifyModel() {
+    console.log("Verifying GLM-4.7 Model access...");
+
+    if (!process.env.HUGGINGFACE_API_KEY) {
+        console.error("Error: HUGGINGFACE_API_KEY not found in .env.local");
         return;
     }
 
-    const hfRouter = createOpenAI({
-        apiKey: apiKey,
-        baseURL: "https://router.huggingface.co/v1"
+    const client = new OpenAI({
+        baseURL: "https://router.huggingface.co/v1",
+        apiKey: process.env.HUGGINGFACE_API_KEY,
     });
 
     try {
-        const { text } = await generateText({
-            model: hfRouter('zai-org/GLM-4.7-Flash:novita'),
-            prompt: 'Say "Working"',
+        const stream = await client.chat.completions.create({
+            model: "zai-org/GLM-4.7-Flash",
+            messages: [{ role: "user", content: "Hello, say 'Test OK'" }],
+            stream: true,
         });
-        console.log('Response:', text);
-    } catch (e) {
-        console.error('FAILED:', e.message);
-        if (e.data) console.log('Error Data:', JSON.stringify(e.data, null, 2));
+
+        console.log("Stream connected!");
+        for await (const chunk of stream) {
+            const content = chunk.choices[0]?.delta?.content || "";
+            process.stdout.write(content);
+        }
+        console.log("\nVerification Complete.");
+
+    } catch (error) {
+        console.error("Verification Failed:", error);
     }
 }
 
-test().catch(console.error);
+verifyModel();
