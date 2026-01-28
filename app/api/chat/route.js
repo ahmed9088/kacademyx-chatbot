@@ -43,7 +43,7 @@ Your goal is to be the ultimate educational resource, adapting perfectly to the 
         }));
 
         const result = streamText({
-            model: openai("zai-org/GLM-4.7-Flash:novita"),
+            model: openai("Qwen/Qwen2.5-Coder-32B-Instruct"),
             system: activeSystemPrompt,
             messages: validMessages, // Pass sanitized messages
             temperature: 0.7,
