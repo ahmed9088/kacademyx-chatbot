@@ -385,7 +385,7 @@ export default function Home() {
         savedMessageIds.current.add(msg.id);
 
         try {
-          console.log(">>> AUTO-SAVING AI MESSAGE TO DB:", msg.id);
+
           // For auto-save of existing messages (e.g. recovery), we don't pass a specific ID unless we want to force it
           // But here msg.id IS the one we want.
           await sendAssistantMessage(activeChatId, userId, msg.content.trim(), msg.id);
@@ -635,7 +635,7 @@ export default function Home() {
         />
 
         {/* DEBUG: Log what ChatWindow receives */}
-        {console.log(">>> FILTERED MESSAGES FOR CHATWINDOW:", messages.filter(m => m.id !== 'welcome-msg' && messages.length > 1 || messages.length === 1).length, "messages")}
+
 
         <ChatWindow
           messages={messages}

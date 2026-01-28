@@ -222,7 +222,7 @@ const ThinkingIndicator = () => (
 );
 
 const ChatWindow = ({ messages, status, onDeleteMessage, onRegenerate }) => {
-    console.log(">>> CHATWINDOW RENDER - messages.length:", messages?.length, "messages:", messages);
+
 
     const [showScrollBtn, setShowScrollBtn] = useState(false);
     const [hoveredIdx, setHoveredIdx] = useState(null);
